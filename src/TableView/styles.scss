@@ -1,0 +1,41 @@
+/* 
+	Generic Styling, for Desktops/Laptops 
+	*/
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  position: relative;
+}
+
+/* Zebra striping */
+
+tr:nth-of-type(odd) {
+  background: #eee;
+}
+
+th {
+  background: #333;
+  color: white;
+  font-weight: bold;
+  cursor: s-resize;
+  background-repeat: no-repeat;
+  background-position: 3% center;
+}
+
+td,
+th {
+  padding: 6px;
+  border: 1px solid #ccc;
+  text-align: left;
+}
+
+table tbody {
+  overflow: auto;
+  height: 100px;
+}
+
+.filter-box {
+  margin-top: 3px;
+  display: block
+}
