@@ -3,8 +3,11 @@
   "version": "1.0.0",
   "description": "Front End Project Typescript starter. Contains webpack setup for scss, html-loader, TS-transpiler, lite-server.",
   "main": "webpack.config.js",
-  "dependencies": {},
+  "dependencies": {
+    "d3": "5.5.0"
+  },
   "devDependencies": {
+    "@types/d3": "5.0.0",
     "autoprefixer": "8.6.5",
     "awesome-typescript-loader": "5.2.0",
     "css-loader": "1.0.0",

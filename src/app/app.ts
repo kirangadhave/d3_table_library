@@ -1,2 +1,5 @@
 import "./styles.scss";
-console.log("Hello, World!");
+import * as d3 from "d3";
+import { TableView } from "../TableView/TableView";
+
+TableView(d3.select("#table"));
