@@ -13,20 +13,20 @@ export function TableView(
 ) {
   if (!config) config = TableConfig();
   Parser(file, type).then(data => {
-    let [table, thead, tbody] = createTable(base);
-    let widths = createHeader(thead, data.columns);
+    let [thead, tbody] = createTable(base);
+    let searchBars = createHeader(thead, data.columns);
     createBody(tbody, data, data.columns);
-    let table2 = base.html();
+    addSearch(searchBars, data, tbody, data.columns);
   });
 
   function createTable(base: d3Selection) {
     let table = base.append("table");
     let thead = table.append("thead");
     let tbody = table.append("tbody");
-    return [table, thead, tbody];
+    return [thead, tbody];
   }
 
-  function createHeader(head: d3Selection, columns: string[]) {
+  function createHeader(head: d3Selection, columns: string[]): d3Selection {
     let cols = head
       .append("tr")
       .selectAll("th")
@@ -46,7 +46,7 @@ export function TableView(
         return d;
       });
 
-    groups
+    let searchBars = groups
       .append("input")
       .attr("class", "filter-box")
       .attr("type", "text")
@@ -54,14 +54,15 @@ export function TableView(
       .attr("placeholder", d => {
         return `Filter in ${d}`;
       });
-    let widths: any[] = [];
-    groups.each(function() {
-      widths.push((this as any).getBoundingClientRect().width - 12);
-    });
-    return widths;
+
+    return searchBars;
   }
 
-  function createBody(body: d3Selection, data: Table, columns: string[]) {
+  function createBody(
+    body: d3Selection,
+    data: Table,
+    columns: string[]
+  ): d3Selection {
     let _rows = body.selectAll("tr").data(data);
     _rows.exit().remove();
     let rows = _rows
@@ -86,5 +87,64 @@ export function TableView(
       .merge(_cells);
 
     cells.text(d => d.val);
+
+    return rows;
+  }
+
+  function addSearch(
+    searchBars: d3Selection,
+    data: Table,
+    tbody: d3Selection,
+    columns: string[]
+  ) {
+    searchBars.on("keyup", function(d, i) {
+      let search_data = data;
+      let search_text = d3
+        .select(this)
+        .property("value")
+        .trim();
+
+      let searchResults = search_data.map(t => t[d]).map(r => {
+        let regex = new RegExp(`^.*${search_text}.*`, "i");
+        if (regex.test(r)) return regex.exec(r)[0];
+      });
+
+      searchResults = searchResults.filter(r => r);
+
+      let searched_data = searchResults.map(r => {
+        return data.filter(p => {
+          return p[d].indexOf(r) > -1;
+        });
+      });
+
+      searched_data = [].concat.apply([], searched_data);
+
+      console.log(searched_data);
+
+      let rows = tbody.selectAll("tr").data(searched_data);
+      rows.exit().remove();
+      let cells = rows
+        .enter()
+        .append("tr")
+        .merge(rows)
+        .selectAll("td")
+        .data(row => {
+          return columns.map((col, i) => {
+            return {
+              name: col,
+              val: row[col],
+              idx: i
+            };
+          });
+        });
+
+      cells.exit().remove();
+
+      cells
+        .enter()
+        .append("td")
+        .merge(cells)
+        .text(d => d.val);
+    });
   }
 }
